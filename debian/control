@@ -21,7 +21,7 @@ Description: Haskell Test Utility Pack for HUnit and QuickCheck
 
 Package: libhugs-testpack
 Section: devel
-Architecture: any
+Architecture: all
 Depends: ${haskell:Depends}, hugs (>= 98.200503.08-4), libhugs-hunit, libhugs-mtl, libhugs-quickcheck
 Suggests: libhaskell-testpack-doc
 Description: Haskell Test Utility Pack for HUnit and QuickCheck
