@@ -22,7 +22,9 @@ Flag splitBase
 Library
  Hs-Source-Dirs: src
  Exposed-Modules:
-  Test.HUnit.Utils
+  Test.HUnit.Utils,
+  Test.QuickCheck.Utils,
+  Test.QuickCheck.Instances
 
  Extensions: ExistentialQuantification, OverlappingInstances,
    UndecidableInstances, CPP, Rank2Types,

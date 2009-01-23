@@ -1,25 +1,12 @@
 {- arch-tag: Test utilities
 Copyright (C) 2004 - 2005 John Goerzen <jgoerzen@complete.org>
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 -}
 
 {- |
    Module     : Test.HUnit.Utils
    Copyright  : Copyright (C) 2004-2005 John Goerzen
-   License    : GNU GPL, version 2 or above
+   License    : GNU LGPL, version 2 or above
 
    Maintainer : John Goerzen <jgoerzen@complete.org>
    Stability  : provisional
@@ -30,12 +17,17 @@ Utilities for HUnit unit testing.
 Written by John Goerzen, jgoerzen\@complete.org
 -}
 
-module Test.HUnit.Utils (assertRaises, mapassertEqual, qccheck, qctest)
+module Test.HUnit.Utils (assertRaises, mapassertEqual, 
+                         runVerbTestText, qccheck, qctest,
+                         qc2hu, qc2huVerbose)
     where
 import Test.HUnit
 import Test.QuickCheck as QC
 import qualified Control.Exception
+import qualified Test.HUnit as HU
 import System.Random
+import System.IO
+import Text.Printf
 
 {- | Asserts that a specific exception is raised by a given action. -}
 assertRaises :: Show a => String -> Control.Exception.Exception -> IO a -> IO ()
@@ -66,6 +58,26 @@ qccheck config lbl property =
               do rnd <- newStdGen
                  tests config (evaluate property) rnd 0 0 []
 
+
+-- Modified from HUnit
+{- | Like 'runTestText', but with more verbose output. -}
+runVerbTestText :: HU.PutText st -> HU.Test -> IO (HU.Counts, st)
+runVerbTestText (HU.PutText put us) t = do
+  (counts, us') <- HU.performTest reportStart reportError reportFailure us t
+  us'' <- put (HU.showCounts counts) True us'
+  return (counts, us'')
+ where
+  reportStart ss us = do hPrintf stdout "\rTesting %-70s\n"
+                                     (HU.showPath (HU.path ss))
+                         hFlush stdout
+                         put (HU.showCounts (HU.counts ss)) False us
+  reportError   = reportProblem "Error:"   "Error in:   "
+  reportFailure = reportProblem "Failure:" "Failure in: "
+  reportProblem p0 p1 msg ss us = put line True us
+   where line  = "### " ++ kind ++ path' ++ '\n' : msg
+         kind  = if null path' then p0 else p1
+         path' = HU.showPath (HU.path ss)
+
 -- | qctest is equivalent to 'qccheck defaultConfig'
 qctest ::  (QC.Testable a) => String -> a -> Test
 qctest lbl = qccheck defaultConfig lbl
@@ -91,3 +103,19 @@ tests config gen rnd0 ntest nfail stamps
      where
       result      = generate (configSize config ntest) rnd2 gen
       (rnd1,rnd2) = split rnd0
+
+{- | Convert QuickCheck tests to HUnit, with a configurable maximum test count,
+and running counter on the screen for long-running tests. -}
+qc2hu :: QC.Testable a => Int -> String -> a -> HU.Test
+qc2hu maxTest = qccheck (defaultConfig {configMaxTest = maxTest, configMaxFail = 20000,
+                            configEvery = testCount})
+    -- configEvery = testCount for displaying a running test counter
+    where testCountBase n = " (test " ++ show n ++ "/" ++ show maxTest
+          testCount n _ = testCountBase n ++ 
+                          replicate (length (testCountBase n)) '\b'
+
+{- | Like 'qc2hu', but show the test itself for each one. -}
+qc2huVerbose :: QC.Testable a => Int -> String -> a -> HU.Test
+qc2huVerbose maxTest = 
+    qccheck (defaultConfig {configMaxTest = 250, configMaxFail = 20000,
+                            configEvery = \n args -> show n ++ ":\n" ++ unlines args})
