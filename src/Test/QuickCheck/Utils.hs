@@ -33,7 +33,7 @@ expected @=? actual =
                 arguments = ["Result: expected " ++ show expected ++ ", got " ++ show actual],
                 stamp = []}
     
-{- | Like '(@=?)', but with args in a different order. -}
+{- | Like '@=?', but with args in a different order. -}
 (@?=) :: (Eq a, Show a) => a -> a -> Result
 (@?=) = flip (@=?)
 
