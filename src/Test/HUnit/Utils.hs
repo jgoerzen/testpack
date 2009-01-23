@@ -19,7 +19,7 @@ Written by John Goerzen, jgoerzen\@complete.org
 
 module Test.HUnit.Utils (assertRaises, mapassertEqual, 
                          runVerbTestText, qccheck, qctest,
-                         qc2hu, qc2huVerbose)
+                         qc2hu, qc2huVerbose, runVerboseTests)
     where
 import Test.HUnit
 import Test.QuickCheck as QC
@@ -119,3 +119,8 @@ qc2huVerbose :: QC.Testable a => Int -> String -> a -> HU.Test
 qc2huVerbose maxTest = 
     qccheck (defaultConfig {configMaxTest = 250, configMaxFail = 20000,
                             configEvery = \n args -> show n ++ ":\n" ++ unlines args})
+
+{- | Run verbose tests. -}
+runVerboseTests :: HU.Test -> IO (HU.Counts, Int)
+runVerboseTests tests =
+    runVerbTestText (HU.putTextToHandle stderr True) $ tests
