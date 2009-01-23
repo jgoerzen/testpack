@@ -18,8 +18,8 @@ Written by John Goerzen, jgoerzen\@complete.org
 -}
 
 module Test.HUnit.Utils (assertRaises, mapassertEqual, 
-                         runVerbTestText, qccheck, qctest,
-                         qc2hu, qc2huVerbose, runVerboseTests)
+                         runVerbTestText, runVerboseTests, qccheck, qctest,
+                         qc2hu, qc2huVerbose, tl)
     where
 import Test.HUnit
 import Test.QuickCheck as QC
@@ -124,3 +124,7 @@ qc2huVerbose maxTest =
 runVerboseTests :: HU.Test -> IO (HU.Counts, Int)
 runVerboseTests tests =
     runVerbTestText (HU.putTextToHandle stderr True) $ tests
+
+{- | Label the tests list. -}
+tl :: String -> [Test] -> Test
+tl msg t = HU.TestLabel msg $ HU.TestList t
