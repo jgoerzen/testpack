@@ -86,6 +86,8 @@ installdocs: builddocs
 binary-indep: builddocs installdocs
 	dh_testdir
 	dh_testroot
+	dh_haskell -i
+	dh_haskell_depends -i
 	dh_installchangelogs -i
 	dh_installdocs -i
 	dh_installexamples -i
