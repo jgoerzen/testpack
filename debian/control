@@ -10,7 +10,7 @@ Package: libghc6-testpack-dev
 Section: devel
 Architecture: any
 Depends: ${haskell:Depends}
-Suggests: libhaskell-testpack-doc
+Suggests: haskell-testpack-doc
 Description: Haskell Test Utility Pack for HUnit and QuickCheck
  testpack provides utilities for both HUnit and QuickCheck.  These include
  tools for running QuickCheck properties as HUnit test cases, allowing you to
@@ -23,7 +23,7 @@ Package: libhugs-testpack
 Section: devel
 Architecture: all
 Depends: ${haskell:Depends}, hugs (>= 98.200503.08-4), libhugs-hunit, libhugs-mtl, libhugs-quickcheck
-Suggests: libhaskell-testpack-doc
+Suggests: haskell-testpack-doc
 Description: Haskell Test Utility Pack for HUnit and QuickCheck
  testpack provides utilities for both HUnit and QuickCheck.  These include
  tools for running QuickCheck properties as HUnit test cases, allowing you to
@@ -32,7 +32,7 @@ Description: Haskell Test Utility Pack for HUnit and QuickCheck
  generators for other types for QuickCheck, and shortcuts for quickly defining new
  test cases.
 
-Package: libhaskell-testpack-doc
+Package: haskell-testpack-doc
 Section: doc
 Architecture: all
 Description: Documentation for Haskell Test Utility Pack
