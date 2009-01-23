@@ -1,3 +1,11 @@
+testpack (1.0.0-1) unstable; urgency=low
+
+  * Initial release.  This is a fork off of MissingH, taking its HUnit utils
+    and combining them with other code to create a suite of utilities for performing
+    tests in Haskell.
+
+ -- John Goerzen <jgoerzen@complete.org>  Fri, 23 Jan 2009 10:57:14 -0600
+
 missingh (1.0.3.2) unstable; urgency=high
 
   * Rebuild with newer GHC.
