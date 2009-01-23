@@ -33,8 +33,6 @@ configure: configure-stamp
 configure-stamp:
 	dh_testdir
 	# Add here commands to configure the package.
-	make setup
-	./setup configure --prefix=$(LIBPATH) --ghc
 
 	touch configure-stamp
 
@@ -68,7 +66,6 @@ install: build
 	# Add here commands to install the package into debian/tmp
 	dh_haskell -a
 	dh_haskell_depends -a
-	make test-ghc6
 
 builddocs: builddocs-stamp
 builddocs-stamp:
