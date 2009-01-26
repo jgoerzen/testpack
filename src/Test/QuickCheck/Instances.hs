@@ -12,7 +12,13 @@ Copyright (C) 2004 - 2009 John Goerzen <jgoerzen@complete.org>
    Stability  : provisional
    Portability: portable
 
-Utilities for HUnit unit testing.
+Provides Arbitrary instances for:
+
+* Map.Map k v
+
+* Word8 (also a Random instance)
+
+* Char (bounded between chars 0 and 255)
 
 Written by John Goerzen, jgoerzen\@complete.org
 -}

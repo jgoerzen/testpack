@@ -1,11 +1,6 @@
-{- arch-tag: Test utilities
-Copyright (C) 2004 - 2005 John Goerzen <jgoerzen@complete.org>
-
--}
-
 {- |
    Module     : Test.HUnit.Tools
-   Copyright  : Copyright (C) 2004-2005 John Goerzen
+   Copyright  : Copyright (C) 2004-2009 John Goerzen
    License    : GNU LGPL, version 2 or above
 
    Maintainer : John Goerzen <jgoerzen@complete.org>
@@ -46,7 +41,6 @@ mapassertEqual _ _ [] = []
 mapassertEqual descrip func ((inp,result):xs) =
     (TestCase $ assertEqual descrip result (func inp)) : mapassertEqual descrip func xs
 
--- * Turn QuickCheck tests into HUnit tests
 -- | qccheck turns the quickcheck test into an hunit test
 qccheck :: (QC.Testable a) =>
            QC.Config -- ^ quickcheck config
@@ -105,7 +99,14 @@ tests config gen rnd0 ntest nfail stamps
       (rnd1,rnd2) = split rnd0
 
 {- | Convert QuickCheck tests to HUnit, with a configurable maximum test count,
-and running counter on the screen for long-running tests. -}
+and running counter on the screen for long-running tests.  Often used like this:
+
+>q :: QC.Testable a => String -> a -> HU.Test
+>q = qc2hu 250
+>
+>allt = [q "Int -> Integer" prop_int_to_integer,
+>        q "Integer -> Int (safe bounds)" prop_integer_to_int_pass]
+-}
 qc2hu :: QC.Testable a => Int -> String -> a -> HU.Test
 qc2hu maxTest = qccheck (defaultConfig {configMaxTest = maxTest, configMaxFail = 20000,
                             configEvery = testCount})
@@ -120,11 +121,22 @@ qc2huVerbose maxTest =
     qccheck (defaultConfig {configMaxTest = 250, configMaxFail = 20000,
                             configEvery = \n args -> show n ++ ":\n" ++ unlines args})
 
-{- | Run verbose tests. -}
+{- | Run verbose tests.  Example:
+
+>test1 = TestCase ("x" @=? "x")
+>
+>alltests = [TestLabel "test1" test1,
+>            tl "TestNum" TestNum.allt,
+>            tl "TestMap" TestMap.allt,
+>            tl "TestTime" TestTime.allt]
+>
+>main = do runVerboseTests (TestList alltests)
+>          return ()
+-}
 runVerboseTests :: HU.Test -> IO (HU.Counts, Int)
 runVerboseTests tests =
     runVerbTestText (HU.putTextToHandle stderr True) $ tests
 
-{- | Label the tests list. -}
+{- | Label the tests list.  See example under 'runVerboseTests'.-}
 tl :: String -> [Test] -> Test
 tl msg t = HU.TestLabel msg $ HU.TestList t
