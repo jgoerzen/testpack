@@ -3,14 +3,14 @@ Priority: optional
 Maintainer: John Goerzen <jgoerzen@complete.org>
 Build-Depends: debhelper (>= 4.0.0), ghc6 (>= 6.8.2dfsg1), haskell-devscripts (>= 0.6.15),  libghc6-mtl-dev, libghc6-hunit-dev, libghc6-quickcheck-dev
 Build-Depends-Indep: debhelper (>= 4.0.0), haddock, hugs (>= 98.200503.08-4), haskell-devscripts (>= 0.6.15), ghc6 (>= 6.8.2dfsg1), libhugs-hunit, libhugs-mtl, libhugs-quickcheck, libghc6-hunit-doc
-Standards-Version: 3.6.2
+Standards-Version: 3.8.0
 Section: devel
 Homepage: http://hackage.haskell.org/cgi-bin/hackage-scripts/package/testpack
 Vcs-Browser: http://git.complete.org/testpack
 Vcs-Git: git://git.complete.org/testpack
 
 Package: libghc6-testpack-dev
-Section: devel
+Section: libdevel
 Architecture: any
 Depends: ${haskell:Depends}
 Suggests: haskell-testpack-doc
