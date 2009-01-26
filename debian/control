@@ -5,6 +5,9 @@ Build-Depends: debhelper (>= 4.0.0), ghc6 (>= 6.8.2dfsg1), haskell-devscripts (>
 Build-Depends-Indep: debhelper (>= 4.0.0), haddock, hugs (>= 98.200503.08-4), haskell-devscripts (>= 0.6.15), ghc6 (>= 6.8.2dfsg1), libhugs-hunit, libhugs-mtl, libhugs-quickcheck
 Standards-Version: 3.6.2
 Section: devel
+Homepage: http://hackage.haskell.org/cgi-bin/hackage-scripts/package/testpack
+Vcs-Browser: http://git.complete.org/testpack
+Vcs-Git: git://git.complete.org/testpack
 
 Package: libghc6-testpack-dev
 Section: devel
