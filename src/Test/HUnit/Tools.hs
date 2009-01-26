@@ -128,9 +128,12 @@ runVerboseTests :: HU.Test -> IO (HU.Counts, Int)
 runVerboseTests tests =
     -- runVerbTestText (HU.putTextToHandle stderr True) $ tests
     runVerbTestText (myPutText stderr True) $ tests
-    where myPutText h b = do r <- HU.putTextToHandle h b
-                             hFlush h
-                             return r
+    where myPutText h b = 
+              case HU.putTextToHandle h b of
+                PutText putf st -> PutText (myputf h putf) st
+          myputf h putf x y z = do r <- putf x y z
+                                   hFlush h
+                                   return r
 
 {- | Label the tests list. -}
 tl :: String -> [Test] -> Test
