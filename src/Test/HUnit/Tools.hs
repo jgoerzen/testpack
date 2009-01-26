@@ -57,11 +57,14 @@ qccheck config lbl property =
 {- | Like 'runTestText', but with more verbose output. -}
 runVerbTestText :: HU.PutText st -> HU.Test -> IO (HU.Counts, st)
 runVerbTestText (HU.PutText put us) t = do
+  hSetBuffering stdout LineBuffering
+  hSetBuffering stderr LineBuffering
   (counts, us') <- HU.performTest reportStart reportError reportFailure us t
   us'' <- put (HU.showCounts counts) True us'
   return (counts, us'')
  where
-  reportStart ss us = do hPrintf stdout "\rTesting %-70s\n"
+  reportStart ss us = do hFlush stderr
+                         hPrintf stdout "\rTesting %-70s\n"
                                      (HU.showPath (HU.path ss))
                          hFlush stdout
                          put (HU.showCounts (HU.counts ss)) False us
@@ -135,7 +138,14 @@ qc2huVerbose maxTest =
 -}
 runVerboseTests :: HU.Test -> IO (HU.Counts, Int)
 runVerboseTests tests =
-    runVerbTestText (HU.putTextToHandle stderr True) $ tests
+    -- runVerbTestText (HU.putTextToHandle stderr True) $ tests
+    runVerbTestText (myPutText stderr True) $ tests
+    where myPutText h b = 
+              case HU.putTextToHandle h b of
+                PutText putf st -> PutText (myputf h putf) st
+          myputf h putf x y z = do r <- putf x y z
+                                   hFlush h
+                                   return r
 
 {- | Label the tests list.  See example under 'runVerboseTests'.-}
 tl :: String -> [Test] -> Test
