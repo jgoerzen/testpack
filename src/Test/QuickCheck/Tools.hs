@@ -4,7 +4,7 @@ Copyright (C) 2004 - 2009 John Goerzen <jgoerzen@complete.org>
 -}
 
 {- |
-   Module     : Test.QuickCheck.Utils
+   Module     : Test.QuickCheck.Tools
    Copyright  : Copyright (C) 2004-2005 John Goerzen
    License    : GNU LGPL, version 2 or above
 
@@ -17,7 +17,7 @@ Utilities for HUnit unit testing.
 Written by John Goerzen, jgoerzen\@complete.org
 -}
 
-module Test.QuickCheck.Utils (-- * Comparisons
+module Test.QuickCheck.Tools (-- * Comparisons
                               (@=?),
                               (@?=)
                               

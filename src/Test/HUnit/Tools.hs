@@ -4,7 +4,7 @@ Copyright (C) 2004 - 2005 John Goerzen <jgoerzen@complete.org>
 -}
 
 {- |
-   Module     : Test.HUnit.Utils
+   Module     : Test.HUnit.Tools
    Copyright  : Copyright (C) 2004-2005 John Goerzen
    License    : GNU LGPL, version 2 or above
 
@@ -17,7 +17,7 @@ Utilities for HUnit unit testing.
 Written by John Goerzen, jgoerzen\@complete.org
 -}
 
-module Test.HUnit.Utils (assertRaises, mapassertEqual, 
+module Test.HUnit.Tools (assertRaises, mapassertEqual, 
                          runVerbTestText, runVerboseTests, qccheck, qctest,
                          qc2hu, qc2huVerbose, tl)
     where
