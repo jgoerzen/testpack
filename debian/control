@@ -1,4 +1,4 @@
-Source: testpack
+Source: haskell-testpack
 Priority: optional
 Maintainer: John Goerzen <jgoerzen@complete.org>
 Build-Depends: debhelper (>= 4.0.0), ghc6 (>= 6.8.2dfsg1), haskell-devscripts (>= 0.6.15),  libghc6-mtl-dev, libghc6-hunit-dev, libghc6-quickcheck-dev
