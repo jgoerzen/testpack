@@ -110,7 +110,7 @@ qc2hu :: QC.Testable a => Int -> String -> a -> HU.Test
 qc2hu maxTest = qccheck (defaultConfig {configMaxTest = maxTest, configMaxFail = 20000,
                             configEvery = testCount})
     -- configEvery = testCount for displaying a running test counter
-    where testCountBase n = " (test " ++ show n ++ "/" ++ show maxTest
+    where testCountBase n = " (test " ++ show n ++ "/" ++ show maxTest ++ ")"
           testCount n _ = testCountBase n ++ 
                           replicate (length (testCountBase n)) '\b'
 
