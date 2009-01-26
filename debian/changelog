@@ -1,8 +1,9 @@
 haskell-testpack (1.0.0-2) unstable; urgency=low
 
   * Fix copyright and control files.
+  * Clean up some lintian warnings.
 
- -- John Goerzen <jgoerzen@complete.org>  Mon, 26 Jan 2009 15:34:20 -0600
+ -- John Goerzen <jgoerzen@complete.org>  Mon, 26 Jan 2009 15:36:27 -0600
 
 haskell-testpack (1.0.0-1) unstable; urgency=low
 
