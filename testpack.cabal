@@ -26,8 +26,8 @@ Flag splitBase
 Library
  Hs-Source-Dirs: src
  Exposed-Modules:
-  Test.HUnit.Utils,
-  Test.QuickCheck.Utils,
+  Test.HUnit.Tools,
+  Test.QuickCheck.Tools,
   Test.QuickCheck.Instances
 
  Extensions: ExistentialQuantification
