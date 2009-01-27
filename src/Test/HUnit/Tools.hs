@@ -25,7 +25,12 @@ import System.IO
 import Text.Printf
 
 {- | Asserts that a specific exception is raised by a given action. -}
+#if defined(__GLASGOW_HASKELL__) && __GLASGOW_HASKELL__ >= 610
+assertRaises :: (Show a, Control.Exception.Exception e, Show e, Eq e) =>
+                String -> e -> IO a -> IO ()
+#else
 assertRaises :: Show a => String -> Control.Exception.Exception -> IO a -> IO ()
+#endif
 assertRaises msg selector action =
     let thetest e = if e == selector then return ()
                     else assertFailure $ msg ++ "\nReceived unexpected exception: "

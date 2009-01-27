@@ -30,7 +30,7 @@ Library
   Test.QuickCheck.Tools,
   Test.QuickCheck.Instances
 
- Extensions: ExistentialQuantification
+ Extensions: ExistentialQuantification, CPP
 
  Build-Depends: base,
                haskell98, mtl, HUnit, 
