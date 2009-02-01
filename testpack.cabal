@@ -30,7 +30,7 @@ Library
   Test.QuickCheck.Tools,
   Test.QuickCheck.Instances
 
- Extensions: ExistentialQuantification
+ Extensions: ExistentialQuantification, CPP
 
  -- Hack for cabal-install weirdness.  cabal-install forces base 3,
  -- though it works fine for Setup.lhs manually.  Fix.
