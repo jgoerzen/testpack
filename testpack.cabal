@@ -32,11 +32,10 @@ Library
 
  Extensions: ExistentialQuantification
 
-  -- Hack for cabal-install weirdness.  cabal-install forces base 3,
-  -- though it works fine for Setup.lhs manually.  Fix.
-  if impl(ghc >= 6.9)
-     build-depends: base >= 4
-
+ -- Hack for cabal-install weirdness.  cabal-install forces base 3,
+ -- though it works fine for Setup.lhs manually.  Fix.
+ if impl(ghc >= 6.9)
+    build-depends: base >= 4
 
  Build-Depends: base,
                haskell98, mtl, HUnit, 
