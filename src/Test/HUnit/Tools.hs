@@ -48,7 +48,7 @@ mapassertEqual descrip func ((inp,result):xs) =
 
 -- | qccheck turns the quickcheck test into an hunit test
 qccheck :: (QC.Testable a) =>
-           QC.Config -- ^ quickcheck config
+           QC.Args -- ^ quickcheck config
         -> String -- ^ label for the property
         -> a      -- ^ quickcheck property
         -> Test
@@ -80,12 +80,12 @@ runVerbTestText (HU.PutText put us) t = do
          kind  = if null path' then p0 else p1
          path' = HU.showPath (HU.path ss)
 
--- | qctest is equivalent to 'qccheck defaultConfig'
+-- | qctest is equivalent to 'qccheck stdArgs'
 qctest ::  (QC.Testable a) => String -> a -> Test
-qctest lbl = qccheck defaultConfig lbl
+qctest lbl = qccheck stdArgs lbl
 
 -- | modified version of the tests function from Test.QuickCheck
-tests :: Config -> Gen Result -> StdGen -> Int -> Int -> [[String]] -> IO ()
+tests :: Args -> Gen Result -> StdGen -> Int -> Int -> [[String]] -> IO ()
 tests config gen rnd0 ntest nfail stamps
   | ntest == configMaxTest config = return ()
   | nfail == configMaxFail config = assertFailure $ "Arguments exhausted after " ++ show ntest ++ " tests."
