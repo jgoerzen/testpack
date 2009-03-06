@@ -1,5 +1,5 @@
 Name: testpack
-Version: 1.0.2
+Version: 1.1.0
 License: LGPL
 Maintainer: John Goerzen <jgoerzen@complete.org>
 Author: John Goerzen
@@ -39,7 +39,7 @@ Library
 
  Build-Depends: base,
                haskell98, mtl, HUnit, 
-               QuickCheck >= 1.0 && < 2.0
+               QuickCheck >= 2.0
  If flag(splitBase)
    Build-Depends: base >= 3, containers, random
  Else
