@@ -1,3 +1,9 @@
+haskell-testpack (1.0.0-3) unstable; urgency=low
+
+  * Upload for GHC 6.10.
+
+ -- John Goerzen <jgoerzen@complete.org>  Fri, 06 Mar 2009 08:17:39 -0600
+
 haskell-testpack (1.0.0-2) unstable; urgency=low
 
   * Fix copyright and control files.
