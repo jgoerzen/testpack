@@ -87,8 +87,8 @@ qctest lbl = qccheck stdArgs lbl
 -- | modified version of the tests function from Test.QuickCheck
 tests :: Args -> Gen Result -> StdGen -> Int -> Int -> [[String]] -> IO ()
 tests config gen rnd0 ntest nfail stamps
-  | ntest == configMaxTest config = return ()
-  | nfail == configMaxFail config = assertFailure $ "Arguments exhausted after " ++ show ntest ++ " tests."
+  | ntest == maxSuccess config = return ()
+  | nfail == maxDiscard config = assertFailure $ "Arguments exhausted after " ++ show ntest ++ " tests."
   | otherwise               =
       do putStr (configEvery config ntest (arguments result))
          case ok result of
@@ -116,7 +116,7 @@ and running counter on the screen for long-running tests.  Often used like this:
 >        q "Integer -> Int (safe bounds)" prop_integer_to_int_pass]
 -}
 qc2hu :: QC.Testable a => Int -> String -> a -> HU.Test
-qc2hu maxTest = qccheck (defaultConfig {configMaxTest = maxTest, configMaxFail = 20000,
+qc2hu maxTest = qccheck (stdArgs {maxSuccess = maxTest, maxDiscard = 20000,
                             configEvery = testCount})
     -- configEvery = testCount for displaying a running test counter
     where testCountBase n = " (test " ++ show n ++ "/" ++ show maxTest ++ ")"
@@ -126,8 +126,8 @@ qc2hu maxTest = qccheck (defaultConfig {configMaxTest = maxTest, configMaxFail =
 {- | Like 'qc2hu', but show the test itself for each one. -}
 qc2huVerbose :: QC.Testable a => Int -> String -> a -> HU.Test
 qc2huVerbose maxTest = 
-    qccheck (defaultConfig {configMaxTest = 250, configMaxFail = 20000,
-                            configEvery = \n args -> show n ++ ":\n" ++ unlines args})
+    qccheck (stdArgs {maxSuccess = 250, maxDiscard = 20000,
+                      configEvery = \n args -> show n ++ ":\n" ++ unlines args})
 
 {- | Run verbose tests.  Example:
 
