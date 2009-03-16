@@ -2,7 +2,7 @@ haskell-testpack (1.0.0-3) unstable; urgency=low
 
   * Upload for GHC 6.10.
 
- -- John Goerzen <jgoerzen@complete.org>  Fri, 06 Mar 2009 08:17:39 -0600
+ -- John Goerzen <jgoerzen@complete.org>  Mon, 16 Mar 2009 10:46:47 -0500
 
 haskell-testpack (1.0.0-2) unstable; urgency=low
 
