@@ -2,7 +2,7 @@ Source: haskell-testpack
 Priority: extra
 Maintainer: Debian Haskell Group <pkg-haskell-maintainers@lists.alioth.debian.org>
 Uploaders: John Goerzen <jgoerzen@complete.org>
-Build-Depends: cdbs,
+Build-Depends: cdbs (>= 0.4.59),
                debhelper (>= 7),
                ghc6,
                haskell-devscripts (>= 0.7),
