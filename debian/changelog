@@ -1,4 +1,4 @@
-haskell-testpack (1.0.2-1) UNRELEASED; urgency=low
+haskell-testpack (1.0.2-1) unstable; urgency=low
 
   * New upstream release 1.0.2.
   * debian/rules: Update to use hlibrary
@@ -12,7 +12,7 @@ haskell-testpack (1.0.2-1) UNRELEASED; urgency=low
     + Update priority to extra
   * debian/watch: Add, based on group template
 
- -- Iain Lane <laney@ubuntu.com>  Thu, 11 Mar 2010 10:43:15 +0000
+ -- Iain Lane <laney@ubuntu.com>  Thu, 11 Mar 2010 11:30:40 +0000
 
 haskell-testpack (1.0.0-4) unstable; urgency=low
 
