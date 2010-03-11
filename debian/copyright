@@ -1,4 +1,9 @@
-This is convertible, written and maintained by John Goerzen <jgoerzen@complete.org>
+This is testpack, written by John Goerzen <jgoerzen@complete.org> and
+maintained by the Debian Haskell Group
+<pkg-haskell-maintainers@lists.alioth.debian.org>.
+
+Packaging is (c) 2009 John Goerzen <jgoerzen@complete.org>
+             (c) 2010 Iain Lane <laney@ubuntu.com>
 
 The original source can always be found at:
     http://hackage.haskell.org/cgi-bin/hackage-scripts/package/testpack

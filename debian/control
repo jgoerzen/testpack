@@ -1,19 +1,34 @@
 Source: haskell-testpack
-Priority: optional
-Maintainer: John Goerzen <jgoerzen@complete.org>
-Build-Depends: debhelper (>= 4.0.0), ghc6 (>= 6.10.3-3), haskell-devscripts (>= 0.6.15),  libghc6-mtl-dev, libghc6-hunit-dev, libghc6-quickcheck1-dev
-Build-Depends-Indep: debhelper (>= 4.0.0), haddock, hugs (>= 98.200503.08-4), haskell-devscripts (>= 0.6.15), ghc6 (>= 6.10), libhugs-hunit, libhugs-mtl, libhugs-quickcheck, libghc6-hunit-doc
-Standards-Version: 3.8.0
-Section: devel
+Priority: extra
+Maintainer: Debian Haskell Group <pkg-haskell-maintainers@lists.alioth.debian.org>
+Uploaders: John Goerzen <jgoerzen@complete.org>
+Build-Depends: cdbs,
+               debhelper (>= 7),
+               ghc6,
+               haskell-devscripts (>= 0.7),
+               libghc6-mtl-dev,
+               libghc6-hunit-dev,
+               libghc6-quickcheck1-dev,
+               ghc6-prof,
+               libghc6-mtl-prof,
+               libghc6-hunit-prof,
+               libghc6-quickcheck1-prof
+Build-Depends-Indep: ghc6-doc,
+                     libghc6-mtl-doc,
+                     libghc6-hunit-doc,
+                     libghc6-quickcheck1-doc
+Standards-Version: 3.8.4
+Section: haskell
 Homepage: http://hackage.haskell.org/cgi-bin/hackage-scripts/package/testpack
-Vcs-Browser: http://git.complete.org/testpack
-Vcs-Git: git://git.complete.org/testpack
+Vcs-Browser: http://git.debian.org/?p=pkg-haskell/haskell-testpack.git;a=summary
+Vcs-Git: git://git.debian.org/git/pkg-haskell/haskell-testpack.git
 
 Package: libghc6-testpack-dev
-Section: libdevel
 Architecture: any
-Depends: ${haskell:Depends}
-Suggests: haskell-testpack-doc
+Depends: ${haskell:Depends}, ${shlibs:Depends}, ${misc:Depends}
+Recommends: ${haskell:Recommends}
+Suggests: ${haskell:Suggests}
+Provides: ${haskell:Provides}
 Description: Haskell Test Utility Pack for HUnit and QuickCheck
  testpack provides utilities for both HUnit and QuickCheck.  These include
  tools for running QuickCheck properties as HUnit test cases, allowing you to
@@ -21,12 +36,15 @@ Description: Haskell Test Utility Pack for HUnit and QuickCheck
  helpful displays of running progress in both HUnit and QuickCheck, additional
  generators for other types for QuickCheck, and shortcuts for quickly defining new
  test cases.
+ .
+ This package contains the development libraries.
 
-Package: libhugs-testpack
-Section: devel
-Architecture: all
-Depends: ${haskell:Depends}, hugs (>= 98.200503.08-4), libhugs-hunit, libhugs-mtl, libhugs-quickcheck
-Suggests: haskell-testpack-doc
+Package: libghc6-testpack-prof
+Architecture: any
+Depends: ${haskell:Depends}, ${shlibs:Depends}, ${misc:Depends}
+Recommends: ${haskell:Recommends}
+Suggests: ${haskell:Suggests}
+Provides: ${haskell:Provides}
 Description: Haskell Test Utility Pack for HUnit and QuickCheck
  testpack provides utilities for both HUnit and QuickCheck.  These include
  tools for running QuickCheck properties as HUnit test cases, allowing you to
@@ -34,10 +52,15 @@ Description: Haskell Test Utility Pack for HUnit and QuickCheck
  helpful displays of running progress in both HUnit and QuickCheck, additional
  generators for other types for QuickCheck, and shortcuts for quickly defining new
  test cases.
+ .
+ This package contains the profiling libraries.
 
-Package: haskell-testpack-doc
+Package: libghc6-testpack-doc
 Section: doc
 Architecture: all
+Depends: ${haskell:Depends}, ${misc:Depends}
+Recommends: ${haskell:Recommends}
+Suggests: ${haskell:Suggests}
 Description: Documentation for Haskell Test Utility Pack
  testpack provides utilities for both HUnit and QuickCheck.  These include
  tools for running QuickCheck properties as HUnit test cases, allowing you to
@@ -45,3 +68,5 @@ Description: Documentation for Haskell Test Utility Pack
  helpful displays of running progress in both HUnit and QuickCheck, additional
  generators for other types for QuickCheck, and shortcuts for quickly defining new
  test cases.
+ .
+ This package contains the documentation.

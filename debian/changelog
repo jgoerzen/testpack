@@ -1,3 +1,19 @@
+haskell-testpack (1.0.2-1) UNRELEASED; urgency=low
+
+  * New upstream release 1.0.2.
+  * debian/rules: Update to use hlibrary
+  * debian/control:
+    + Switch to team maintenance, update Vcs-* metadata accordingly
+    + Build profiling library and rename documentation package to group
+      standards
+    + Adjust build-depends to current group practice
+    + Standards-Version bump to 3.8.4, no changes required
+    + Update section to Haskell
+    + Update priority to extra
+  * debian/watch: Add, based on group template
+
+ -- Iain Lane <laney@ubuntu.com>  Thu, 11 Mar 2010 10:43:15 +0000
+
 haskell-testpack (1.0.0-4) unstable; urgency=low
 
   * Rebuild for newer GHC.
