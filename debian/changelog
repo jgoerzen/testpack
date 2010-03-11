@@ -6,6 +6,7 @@ haskell-testpack (1.0.2-1) unstable; urgency=low
     + Switch to team maintenance, update Vcs-* metadata accordingly
     + Build profiling library and rename documentation package to group
       standards
+    + Drop hugs library package as the group no longer supports hugs
     + Adjust build-depends to current group practice
     + Standards-Version bump to 3.8.4, no changes required
     + Update section to Haskell
