@@ -61,6 +61,8 @@ Architecture: all
 Depends: ${haskell:Depends}, ${misc:Depends}
 Recommends: ${haskell:Recommends}
 Suggests: ${haskell:Suggests}
+Conflicts: haskell-testpack-doc
+Replaces: haskell-testpack-doc
 Description: Documentation for Haskell Test Utility Pack
  testpack provides utilities for both HUnit and QuickCheck.  These include
  tools for running QuickCheck properties as HUnit test cases, allowing you to
