@@ -34,8 +34,8 @@ Description: Haskell Test Utility Pack for HUnit and QuickCheck
  tools for running QuickCheck properties as HUnit test cases, allowing you to
  combine both approaches in a single program.  It also includes tools for more
  helpful displays of running progress in both HUnit and QuickCheck, additional
- generators for other types for QuickCheck, and shortcuts for quickly defining new
- test cases.
+ generators for other types for QuickCheck, and shortcuts for quickly defining
+ new test cases.
  .
  This package contains the development libraries.
 
@@ -50,8 +50,8 @@ Description: Haskell Test Utility Pack for HUnit and QuickCheck
  tools for running QuickCheck properties as HUnit test cases, allowing you to
  combine both approaches in a single program.  It also includes tools for more
  helpful displays of running progress in both HUnit and QuickCheck, additional
- generators for other types for QuickCheck, and shortcuts for quickly defining new
- test cases.
+ generators for other types for QuickCheck, and shortcuts for quickly defining
+ new test cases.
  .
  This package contains the profiling libraries.
 
@@ -68,7 +68,7 @@ Description: Documentation for Haskell Test Utility Pack
  tools for running QuickCheck properties as HUnit test cases, allowing you to
  combine both approaches in a single program.  It also includes tools for more
  helpful displays of running progress in both HUnit and QuickCheck, additional
- generators for other types for QuickCheck, and shortcuts for quickly defining new
- test cases.
+ generators for other types for QuickCheck, and shortcuts for quickly defining
+ new test cases.
  .
  This package contains the documentation.
