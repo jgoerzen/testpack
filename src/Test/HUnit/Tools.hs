@@ -191,8 +191,7 @@ localquickCheckWithResult args p =
 
     doneTesting :: State -> (StdGen -> Int -> Prop) -> IO Result
     doneTesting st f =
-      do success st
-         if expectedFailure st then
+      do if expectedFailure st then
            return Success{ labels = summary st }
            else
            return NoExpectedFailure{ labels = summary st }
@@ -200,7 +199,6 @@ localquickCheckWithResult args p =
     giveUp :: State -> (StdGen -> Int -> Prop) -> IO Result
     giveUp st f =
       do
-        success st
         return GaveUp{ numTests = numSuccessTests st
                      , labels   = summary st
                      }
