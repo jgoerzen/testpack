@@ -1,6 +1,6 @@
 {- |
    Module     : Test.HUnit.Tools
-   Copyright  : Copyright (C) 2004-2009 John Goerzen
+   Copyright  : Copyright (C) 2004-2010 John Goerzen
    License    : GNU LGPL, version 2 or above
 
    Maintainer : John Goerzen <jgoerzen@complete.org>
@@ -13,8 +13,8 @@ Written by John Goerzen, jgoerzen\@complete.org
 -}
 
 module Test.HUnit.Tools (assertRaises, mapassertEqual, 
-                         runVerbTestText, runVerboseTests, qccheck, qctest,
-                         qc2hu, qc2huVerbose, tl)
+                         runVerbTestText, runVerboseTests,
+                         tl)
     where
 import Test.HUnit
 import qualified Control.Exception
@@ -68,28 +68,6 @@ runVerbTestText (HU.PutText put us) t = do
          kind  = if null path' then p0 else p1
          path' = HU.showPath (HU.path ss)
 
-
--- | modified version of the tests function from Test.QuickCheck
-tests :: Args -> Gen Result -> StdGen -> Int -> Int -> [[String]] -> IO ()
-tests config gen rnd0 ntest nfail stamps
-  | ntest == maxSuccess config = return ()
-  | nfail == maxDiscard config = assertFailure $ "Arguments exhausted after " ++ show ntest ++ " tests."
-  | otherwise               =
-      do putStr (configEvery config ntest (arguments result))
-         case ok result of
-           Nothing    ->
-             tests config gen rnd1 ntest (nfail+1) stamps
-           Just True  ->
-             tests config gen rnd1 (ntest+1) nfail (stamp result:stamps)
-           Just False ->
-             assertFailure $  ( "Falsifiable, after "
-                   ++ show ntest
-                   ++ " tests:\n"
-                   ++ unlines (arguments result)
-                    )
-     where
-      result      = generate (configSize config ntest) rnd2 gen
-      (rnd1,rnd2) = split rnd0
 
 {- | Run verbose tests.  Example:
 
