@@ -37,10 +37,10 @@ Library
  if impl(ghc >= 6.9)
     build-depends: base >= 4 && <5
 
- Build-Depends: base,
+ Build-Depends: base >= 3 && < 5,
                haskell98, mtl, HUnit, 
                QuickCheck >= 2.0
  If flag(splitBase)
-   Build-Depends: base >= 3, containers, random
+   Build-Depends: base >= 3 && < 5, containers, random
  Else
    Build-Depends: base < 3
