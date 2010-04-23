@@ -13,10 +13,11 @@ Written by John Goerzen, jgoerzen\@complete.org
 -}
 
 module Test.HUnit.Tools (assertRaises, mapassertEqual, 
-                         runVerbTestText, runVerboseTests,
-                         tl)
+                         runVerbTestText, runVerboseTests, qccheck, qctest,
+                         qc2hu, tl)
     where
 import Test.HUnit
+import Test.QuickCheck as QC
 import qualified Control.Exception
 import qualified Test.HUnit as HU
 import System.Random
@@ -45,6 +46,18 @@ mapassertEqual _ _ [] = []
 mapassertEqual descrip func ((inp,result):xs) =
     (TestCase $ assertEqual descrip result (func inp)) : mapassertEqual descrip func xs
 
+-- | qccheck turns the quickcheck test into an hunit test
+qccheck :: (QC.Testable a) =>
+           QC.Args -- ^ quickcheck config
+        -> String -- ^ label for the property
+        -> a      -- ^ quickcheck property
+        -> Test
+qccheck config lbl property =
+    TestLabel lbl $ TestCase $
+      do result <- quickCheckWithResult config property
+         case result of
+           Success _ -> return ()
+           _ -> assertFailure (show result)
 
 -- Modified from HUnit
 {- | Like 'runTestText', but with more verbose output. -}
@@ -68,6 +81,45 @@ runVerbTestText (HU.PutText put us) t = do
          kind  = if null path' then p0 else p1
          path' = HU.showPath (HU.path ss)
 
+-- | qctest is equivalent to 'qccheck stdArgs'
+qctest ::  (QC.Testable a) => String -> a -> Test
+qctest lbl = qccheck stdArgs lbl
+
+{-
+-- | modified version of the tests function from Test.QuickCheck
+tests :: Args -> Gen Result -> StdGen -> Int -> Int -> [[String]] -> IO ()
+tests config gen rnd0 ntest nfail stamps
+  | ntest == maxSuccess config = return ()
+  | nfail == maxDiscard config = assertFailure $ "Arguments exhausted after " ++ show ntest ++ " tests."
+  | otherwise               =
+      do putStr (configEvery config ntest (arguments result))
+         case ok result of
+           Nothing    ->
+             tests config gen rnd1 ntest (nfail+1) stamps
+           Just True  ->
+             tests config gen rnd1 (ntest+1) nfail (stamp result:stamps)
+           Just False ->
+             assertFailure $  ( "Falsifiable, after "
+                   ++ show ntest
+                   ++ " tests:\n"
+                   ++ unlines (arguments result)
+                    )
+     where
+      result      = generate (configSize config ntest) rnd2 gen
+      (rnd1,rnd2) = split rnd0
+-}
+
+{- | Convert QuickCheck tests to HUnit, with a configurable maximum test count.
+Often used like this:
+
+>q :: QC.Testable a => String -> a -> HU.Test
+>q = qc2hu 250
+>
+>allt = [q "Int -> Integer" prop_int_to_integer,
+>        q "Integer -> Int (safe bounds)" prop_integer_to_int_pass]
+-}
+qc2hu :: QC.Testable a => Int -> String -> a -> HU.Test
+qc2hu maxTest = qccheck (stdArgs {maxSuccess = maxTest, maxDiscard = 20000})
 
 {- | Run verbose tests.  Example:
 
