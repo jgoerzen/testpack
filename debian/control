@@ -8,15 +8,12 @@ Build-Depends: cdbs (>= 0.4.59),
                haskell-devscripts (>= 0.7),
                libghc6-mtl-dev,
                libghc6-hunit-dev,
-               libghc6-quickcheck1-dev,
                ghc6-prof,
                libghc6-mtl-prof,
                libghc6-hunit-prof,
-               libghc6-quickcheck1-prof
 Build-Depends-Indep: ghc6-doc,
                      libghc6-mtl-doc,
                      libghc6-hunit-doc,
-                     libghc6-quickcheck1-doc
 Standards-Version: 3.8.4
 Section: haskell
 Homepage: http://hackage.haskell.org/cgi-bin/hackage-scripts/package/testpack
