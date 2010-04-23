@@ -54,7 +54,8 @@ qccheck :: (QC.Testable a) =>
         -> Test
 qccheck config lbl property =
     TestLabel lbl $ TestCase $
-      do result <- quickCheckWithResult config property
+      do putStrLn ""
+         result <- quickCheckWithResult config property
          case result of
            Success _ -> return ()
            _ -> assertFailure (show result)
