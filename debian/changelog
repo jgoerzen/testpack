@@ -1,8 +1,8 @@
-haskell-testpack (2.0.0-1) UNRELEASED; urgency=low
+haskell-testpack (2.0.0-1) unstable; urgency=low
 
-  * New upstream release.
+  * New upstream release, switched to QuickCheck 2.
 
- -- John Goerzen <jgoerzen@complete.org>  Fri, 23 Apr 2010 01:06:31 -0500
+ -- John Goerzen <jgoerzen@complete.org>  Fri, 23 Apr 2010 18:30:54 -0500
 
 haskell-testpack (1.0.2-1) unstable; urgency=low
 
