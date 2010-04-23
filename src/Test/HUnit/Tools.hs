@@ -1,6 +1,6 @@
 {- |
    Module     : Test.HUnit.Tools
-   Copyright  : Copyright (C) 2004-2009 John Goerzen
+   Copyright  : Copyright (C) 2004-2010 John Goerzen
    License    : GNU LGPL, version 2 or above
 
    Maintainer : John Goerzen <jgoerzen@complete.org>
@@ -54,9 +54,10 @@ qccheck :: (QC.Testable a) =>
         -> Test
 qccheck config lbl property =
     TestLabel lbl $ TestCase $
-              do rnd <- newStdGen
-                 tests config (evaluate property) rnd 0 0 []
-
+      do result <- quickCheckWithResult config property
+         case result of
+           Success -> return ()
+           _ -> assertFailure (show result)
 
 -- Modified from HUnit
 {- | Like 'runTestText', but with more verbose output. -}
