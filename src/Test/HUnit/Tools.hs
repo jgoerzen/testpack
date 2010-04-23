@@ -17,7 +17,6 @@ module Test.HUnit.Tools (assertRaises, mapassertEqual,
                          qc2hu, qc2huVerbose, tl)
     where
 import Test.HUnit
-import Test.QuickCheck as QC
 import qualified Control.Exception
 import qualified Test.HUnit as HU
 import System.Random
@@ -46,17 +45,6 @@ mapassertEqual _ _ [] = []
 mapassertEqual descrip func ((inp,result):xs) =
     (TestCase $ assertEqual descrip result (func inp)) : mapassertEqual descrip func xs
 
--- | qccheck turns the quickcheck test into an hunit test
-qccheck :: (QC.Testable a) =>
-           QC.Args -- ^ quickcheck config
-        -> String -- ^ label for the property
-        -> a      -- ^ quickcheck property
-        -> Test
-qccheck config lbl property =
-    TestLabel lbl $ TestCase $
-              do rnd <- newStdGen
-                 tests config (evaluate property) rnd 0 0 []
-
 
 -- Modified from HUnit
 {- | Like 'runTestText', but with more verbose output. -}
@@ -80,9 +68,6 @@ runVerbTestText (HU.PutText put us) t = do
          kind  = if null path' then p0 else p1
          path' = HU.showPath (HU.path ss)
 
--- | qctest is equivalent to 'qccheck stdArgs'
-qctest ::  (QC.Testable a) => String -> a -> Test
-qctest lbl = qccheck stdArgs lbl
 
 -- | modified version of the tests function from Test.QuickCheck
 tests :: Args -> Gen Result -> StdGen -> Int -> Int -> [[String]] -> IO ()
@@ -105,29 +90,6 @@ tests config gen rnd0 ntest nfail stamps
      where
       result      = generate (configSize config ntest) rnd2 gen
       (rnd1,rnd2) = split rnd0
-
-{- | Convert QuickCheck tests to HUnit, with a configurable maximum test count,
-and running counter on the screen for long-running tests.  Often used like this:
-
->q :: QC.Testable a => String -> a -> HU.Test
->q = qc2hu 250
->
->allt = [q "Int -> Integer" prop_int_to_integer,
->        q "Integer -> Int (safe bounds)" prop_integer_to_int_pass]
--}
-qc2hu :: QC.Testable a => Int -> String -> a -> HU.Test
-qc2hu maxTest = qccheck (stdArgs {maxSuccess = maxTest, maxDiscard = 20000,
-                            configEvery = testCount})
-    -- configEvery = testCount for displaying a running test counter
-    where testCountBase n = " (test " ++ show n ++ "/" ++ show maxTest ++ ")"
-          testCount n _ = testCountBase n ++ 
-                          replicate (length (testCountBase n)) '\b'
-
-{- | Like 'qc2hu', but show the test itself for each one. -}
-qc2huVerbose :: QC.Testable a => Int -> String -> a -> HU.Test
-qc2huVerbose maxTest = 
-    qccheck (stdArgs {maxSuccess = 250, maxDiscard = 20000,
-                      configEvery = \n args -> show n ++ ":\n" ++ unlines args})
 
 {- | Run verbose tests.  Example:
 
