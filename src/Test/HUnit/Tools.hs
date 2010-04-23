@@ -147,3 +147,127 @@ runVerboseTests tests =
 {- | Label the tests list.  See example under 'runVerboseTests'.-}
 tl :: String -> [Test] -> Test
 tl msg t = HU.TestLabel msg $ HU.TestList t
+
+------------------------------------------------------------
+-- below code lifted from quickcheck2, Tests.hs, and modified for this purpose
+
+-- | Tests a property, using test arguments, produces a test result, and prints the results to 'stdout'.
+quickCheckWithResult :: Testable prop => Args -> prop -> IO Result
+quickCheckWithResult args p =
+  do tm  <- newTerminal
+     rnd <- case replay args of
+              Nothing      -> newStdGen
+              Just (rnd,_) -> return rnd
+     test MkState{ terminal          = tm
+                 , maxSuccessTests   = maxSuccess args
+                 , maxDiscardedTests = maxDiscard args
+                 , computeSize       = case replay args of
+                                         Nothing    -> \n d -> (n * maxSize args)
+                                                         `div` maxSuccess args
+                                                             + (d `div` 10)
+                                         Just (_,s) -> \_ _ -> s
+                 , numSuccessTests   = 0
+                 , numDiscardedTests = 0
+                 , collected         = []
+                 , expectedFailure   = False
+                 , randomSeed        = rnd
+                 , isShrinking       = False
+                 , numSuccessShrinks = 0
+                 , numTryShrinks     = 0
+                 } (unGen (property p))
+
+--------------------------------------------------------------------------
+-- main test loop
+
+test :: State -> (StdGen -> Int -> Prop) -> IO Result
+test st f
+  | numSuccessTests st   >= maxSuccessTests st   = doneTesting st f
+  | numDiscardedTests st >= maxDiscardedTests st = giveUp st f
+  | otherwise                                    = runATest st f
+
+doneTesting :: State -> (StdGen -> Int -> Prop) -> IO Result
+doneTesting st f =
+  do -- CALLBACK done_testing?
+     if expectedFailure st then
+       putPart (terminal st)
+         ( "+++ OK, passed "
+        ++ show (numSuccessTests st)
+        ++ " tests"
+         )
+      else
+       putPart (terminal st)
+         ( bold ("*** Failed!")
+        ++ " Passed "
+        ++ show (numSuccessTests st)
+        ++ " tests (expected failure)"
+         )
+     success st
+     if expectedFailure st then
+       return Success{ labels = summary st }
+      else
+       return NoExpectedFailure{ labels = summary st }
+  
+giveUp :: State -> (StdGen -> Int -> Prop) -> IO Result
+giveUp st f =
+  do -- CALLBACK gave_up?
+     putPart (terminal st)
+       ( bold ("*** Gave up!")
+      ++ " Passed only "
+      ++ show (numSuccessTests st)
+      ++ " tests"
+       )
+     success st
+     return GaveUp{ numTests = numSuccessTests st
+                  , labels   = summary st
+                  }
+
+runATest :: State -> (StdGen -> Int -> Prop) -> IO Result
+runATest st f =
+  do -- CALLBACK before_test
+     putTemp (terminal st)
+        ( "("
+       ++ number (numSuccessTests st) "test"
+       ++ concat [ "; " ++ show (numDiscardedTests st) ++ " discarded"
+                 | numDiscardedTests st > 0
+                 ]
+       ++ ")"
+        )
+     let size = computeSize st (numSuccessTests st) (numDiscardedTests st)
+     (res, ts) <- run (unProp (f rnd1 size))
+     callbackPostTest st res
+     
+     case ok res of
+       Just True -> -- successful test
+         do test st{ numSuccessTests = numSuccessTests st + 1
+                   , randomSeed      = rnd2
+                   , collected       = stamp res : collected st
+                   , expectedFailure = expect res
+                   } f
+       
+       Nothing -> -- discarded test
+         do test st{ numDiscardedTests = numDiscardedTests st + 1
+                   , randomSeed        = rnd2
+                   , expectedFailure   = expect res
+                   } f
+         
+       Just False -> -- failed test
+         do if expect res
+              then putPart (terminal st) (bold "*** Failed! ")
+              else putPart (terminal st) "+++ OK, failed as expected. "
+            putTemp (terminal st)
+              ( short 30 (P.reason res)
+             ++ " (after "
+             ++ number (numSuccessTests st+1) "test"
+             ++ ")..."
+              )
+            foundFailure st res ts
+            if not (expect res) then
+              return Success{ labels = summary st }
+             else
+              return Failure{ usedSeed = randomSeed st -- correct! (this will be split first)
+                            , usedSize = size
+                            , reason   = P.reason res
+                            , labels   = summary st
+                            }
+ where
+  (rnd1,rnd2) = split (randomSeed st)
