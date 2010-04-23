@@ -1,9 +1,9 @@
 Name: testpack
-Version: 1.0.2
+Version: 2.0.0
 License: LGPL
 Maintainer: John Goerzen <jgoerzen@complete.org>
 Author: John Goerzen
-Copyright: Copyright (c) 2004-2009 John Goerzen
+Copyright: Copyright (c) 2004-2010 John Goerzen
 license-file: COPYRIGHT
 extra-source-files: COPYING, Makefile
 homepage: http://hackage.haskell.org/cgi-bin/hackage-scripts/package/testpack
@@ -26,21 +26,14 @@ Flag splitBase
 Library
  Hs-Source-Dirs: src
  Exposed-Modules:
-  Test.HUnit.Tools,
-  Test.QuickCheck.Tools,
-  Test.QuickCheck.Instances
+  Test.HUnit.Tools
 
  Extensions: ExistentialQuantification, CPP
 
  -- Hack for cabal-install weirdness.  cabal-install forces base 3,
  -- though it works fine for Setup.lhs manually.  Fix.
  if impl(ghc >= 6.9)
-    build-depends: base >= 4
+    build-depends: base >= 4 && <5
 
  Build-Depends: base,
-               haskell98, mtl, HUnit, 
-               QuickCheck >= 1.0 && < 2.0
- If flag(splitBase)
-   Build-Depends: base >= 3, containers, random
- Else
-   Build-Depends: base < 3
+               mtl, HUnit, containers, random

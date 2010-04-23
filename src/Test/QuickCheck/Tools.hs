@@ -23,15 +23,17 @@ module Test.QuickCheck.Tools (-- * Comparisons
                               
                              )
 where
-import Test.QuickCheck
+import Test.QuickCheck hiding (Result, reason)
+import Test.QuickCheck.Property
 
 {- | Compare two values.  If same, the test passes.  If different, the result indicates
 what was expected and what was received as part of the error. -}
 (@=?) :: (Eq a, Show a) => a -> a -> Result
 expected @=? actual = 
-        Result {ok = Just (expected == actual), 
-                arguments = ["Result: expected " ++ show expected ++ ", got " ++ show actual],
-                stamp = []}
+        MkResult {ok = Just (expected == actual), 
+                  expect = True,
+                  reason = "Result: expected " ++ show expected ++ ", got " ++ show actual,
+                  stamp = [], callbacks = []}
     
 {- | Like '@=?', but with args in a different order. -}
 (@?=) :: (Eq a, Show a) => a -> a -> Result
