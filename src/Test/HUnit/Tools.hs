@@ -16,8 +16,13 @@ module Test.HUnit.Tools (assertRaises, mapassertEqual,
                          runVerbTestText, runVerboseTests, qccheck, qctest,
                          qc2hu, tl)
     where
-import Test.HUnit
 import Test.QuickCheck as QC
+import Test.QuickCheck.Text
+import Test.QuickCheck.Test
+import Test.QuickCheck.Gen
+import Test.QuickCheck.State
+import qualified Test.QuickCheck.Property as P
+import Test.QuickCheck.Property hiding (Result(reason))
 import qualified Control.Exception
 import qualified Test.HUnit as HU
 import System.Random
@@ -33,31 +38,31 @@ assertRaises :: Show a => String -> Control.Exception.Exception -> IO a -> IO ()
 #endif
 assertRaises msg selector action =
     let thetest e = if e == selector then return ()
-                    else assertFailure $ msg ++ "\nReceived unexpected exception: "
+                    else HU.assertFailure $ msg ++ "\nReceived unexpected exception: "
                              ++ (show e) ++ "\ninstead of exception: " ++ (show selector)
         in do
            r <- Control.Exception.try action
            case r of
                   Left e -> thetest e
-                  Right _ -> assertFailure $ msg ++ "\nReceived no exception, but was expecting exception: " ++ (show selector)
+                  Right _ -> HU.assertFailure $ msg ++ "\nReceived no exception, but was expecting exception: " ++ (show selector)
 
-mapassertEqual :: (Show b, Eq b) => String -> (a -> b) -> [(a, b)] -> [Test]
+mapassertEqual :: (Show b, Eq b) => String -> (a -> b) -> [(a, b)] -> [HU.Test]
 mapassertEqual _ _ [] = []
 mapassertEqual descrip func ((inp,result):xs) =
-    (TestCase $ assertEqual descrip result (func inp)) : mapassertEqual descrip func xs
+    (HU.TestCase $ HU.assertEqual descrip result (func inp)) : mapassertEqual descrip func xs
 
 -- | qccheck turns the quickcheck test into an hunit test
 qccheck :: (QC.Testable a) =>
            QC.Args -- ^ quickcheck config
         -> String -- ^ label for the property
         -> a      -- ^ quickcheck property
-        -> Test
+        -> HU.Test
 qccheck config lbl property =
-    TestLabel lbl $ TestCase $
-      do result <- quickCheckWithResult config property
+    HU.TestLabel lbl $ HU.TestCase $
+      do result <- localquickCheckWithResult config property
          case result of
            Success _ -> return ()
-           _ -> assertFailure (show result)
+           _ -> HU.assertFailure (show result)
 
 -- Modified from HUnit
 {- | Like 'runTestText', but with more verbose output. -}
@@ -82,7 +87,7 @@ runVerbTestText (HU.PutText put us) t = do
          path' = HU.showPath (HU.path ss)
 
 -- | qctest is equivalent to 'qccheck stdArgs'
-qctest ::  (QC.Testable a) => String -> a -> Test
+qctest ::  (QC.Testable a) => String -> a -> HU.Test
 qctest lbl = qccheck stdArgs lbl
 
 {-
@@ -139,21 +144,21 @@ runVerboseTests tests =
     runVerbTestText (myPutText stderr True) $ tests
     where myPutText h b = 
               case HU.putTextToHandle h b of
-                PutText putf st -> PutText (myputf h putf) st
+                HU.PutText putf st -> HU.PutText (myputf h putf) st
           myputf h putf x y z = do r <- putf x y z
                                    hFlush h
                                    return r
 
 {- | Label the tests list.  See example under 'runVerboseTests'.-}
-tl :: String -> [Test] -> Test
+tl :: String -> [HU.Test] -> HU.Test
 tl msg t = HU.TestLabel msg $ HU.TestList t
 
 ------------------------------------------------------------
 -- below code lifted from quickcheck2, Tests.hs, and modified for this purpose
 
 -- | Tests a property, using test arguments, produces a test result, and prints the results to 'stdout'.
-quickCheckWithResult :: Testable prop => Args -> prop -> IO Result
-quickCheckWithResult args p =
+localquickCheckWithResult :: Testable prop => Args -> prop -> IO Result
+localquickCheckWithResult args p =
   do tm  <- newTerminal
      rnd <- case replay args of
               Nothing      -> newStdGen
@@ -186,12 +191,11 @@ quickCheckWithResult args p =
 
     doneTesting :: State -> (StdGen -> Int -> Prop) -> IO Result
     doneTesting st f =
-      do
-        success st
-       if expectedFailure st then
-         return Success{ labels = summary st }
-       else
-         return NoExpectedFailure{ labels = summary st }
+      do success st
+         if expectedFailure st then
+           return Success{ labels = summary st }
+           else
+           return NoExpectedFailure{ labels = summary st }
   
     giveUp :: State -> (StdGen -> Int -> Prop) -> IO Result
     giveUp st f =
@@ -224,12 +228,12 @@ quickCheckWithResult args p =
          
           Just False -> -- failed test
             do foundFailure st res ts
-              if not (expect res) then
-                return Success{ labels = summary st }
-              else
-                return Failure{ usedSeed = randomSeed st -- correct! (this will be split first)
-                              , usedSize = size
-                              , reason   = P.reason res
-                              , labels   = summary st
-                              }
-  (rnd1,rnd2) = split (randomSeed st)
+               if not (expect res) then
+                 return Success{ labels = summary st }
+                 else
+                 return Failure{ usedSeed = randomSeed st -- correct! (this will be split first)
+                               , usedSize = size
+                               , reason   = P.reason res
+                               , labels   = summary st
+                               }
+      where (rnd1,rnd2) = split (randomSeed st)
