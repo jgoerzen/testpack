@@ -207,7 +207,8 @@ localquickCheckWithResult args p =
     runATest st f =
       do
         let size = computeSize st (numSuccessTests st) (numDiscardedTests st)
-        (res, ts) <- run (unProp (f rnd1 size))
+        MkRose mres ts <- protectRose (unProp (f rnd1 size))
+        res <- mres
         callbackPostTest st res
      
         case ok res of
