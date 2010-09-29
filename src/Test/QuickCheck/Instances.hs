@@ -1,11 +1,11 @@
 {-
-Copyright (C) 2004 - 2009 John Goerzen <jgoerzen@complete.org>
+Copyright (C) 2004 - 2010 John Goerzen <jgoerzen@complete.org>
 
 -}
 
 {- |
    Module     : Test.QuickCheck.Instances
-   Copyright  : Copyright (C) 2004-2005 John Goerzen
+   Copyright  : Copyright (C) 2004-2010 John Goerzen
    License    : GNU LGPL, version 2 or above
 
    Maintainer : John Goerzen <jgoerzen@complete.org>
@@ -36,12 +36,16 @@ instance (Arbitrary k, Arbitrary v, Eq k, Ord k) => Arbitrary (Map.Map k v) wher
 instance (CoArbitrary k, CoArbitrary v, Eq k, Ord k) => CoArbitrary (Map.Map k v) where
     coarbitrary = coarbitrary . Map.keys
 
+#if MIN_VERSION_QuickCheck(2,3,0)
+    -- we have Word8 instances here
+#else
 instance Arbitrary Word8 where
     arbitrary = sized $ \n -> choose (0, min (fromIntegral n) maxBound)
 
 instance CoArbitrary Word8 where
     coarbitrary n = variant (if n >= 0 then 2 * x else 2 * x + 1)
                 where x = abs . fromIntegral $ n
+#endif
 
 instance Random Word8 where
     randomR (a, b) g = (\(x, y) -> (fromInteger x, y)) $
