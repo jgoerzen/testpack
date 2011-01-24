@@ -61,7 +61,7 @@ qccheck config lbl property =
     HU.TestLabel lbl $ HU.TestCase $
       do result <- localquickCheckWithResult config property
          case result of
-           Success _ -> return ()
+           Success _ _ _ -> return ()
            _ -> HU.assertFailure (show result)
 
 -- Modified from HUnit
@@ -159,7 +159,7 @@ tl msg t = HU.TestLabel msg $ HU.TestList t
 -- | Tests a property, using test arguments, produces a test result, and prints the results to 'stdout'.
 localquickCheckWithResult :: Testable prop => Args -> prop -> IO Result
 localquickCheckWithResult args p =
-  do tm  <- newTerminal
+  do tm  <- newStdioTerminal
      rnd <- case replay args of
               Nothing      -> newStdGen
               Just (rnd,_) -> return rnd
@@ -176,7 +176,6 @@ localquickCheckWithResult args p =
                  , collected         = []
                  , expectedFailure   = False
                  , randomSeed        = rnd
-                 , isShrinking       = False
                  , numSuccessShrinks = 0
                  , numTryShrinks     = 0
                  } (unGen (property p))
@@ -207,8 +206,7 @@ localquickCheckWithResult args p =
     runATest st f =
       do
         let size = computeSize st (numSuccessTests st) (numDiscardedTests st)
-        MkRose mres ts <- protectRose (unProp (f rnd1 size))
-        res <- mres
+        MkRose res ts <- protectRose (reduceRose (unProp (f rnd1 size)))
         callbackPostTest st res
      
         case ok res of
