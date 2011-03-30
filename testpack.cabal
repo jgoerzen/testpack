@@ -39,7 +39,7 @@ Library
 
  Build-Depends: base >= 3 && < 5,
                haskell98, mtl, HUnit, 
-               QuickCheck >= 2.1.0.3 && < 2.2
+               QuickCheck >= 2.1.0.3
  If flag(splitBase)
    Build-Depends: base >= 3 && < 5, containers, random
  Else
