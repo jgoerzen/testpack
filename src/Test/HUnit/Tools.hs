@@ -61,7 +61,7 @@ qccheck config lbl property =
     HU.TestLabel lbl $ HU.TestCase $
       do result <- localquickCheckWithResult config property
          case result of
-           Success _ -> return ()
+           Success _ _ _ -> return ()
            _ -> HU.assertFailure (show result)
 
 -- Modified from HUnit
@@ -159,7 +159,7 @@ tl msg t = HU.TestLabel msg $ HU.TestList t
 -- | Tests a property, using test arguments, produces a test result, and prints the results to 'stdout'.
 localquickCheckWithResult :: Testable prop => Args -> prop -> IO Result
 localquickCheckWithResult args p =
-  do tm  <- newTerminal
+  do tm  <- if chatty args then newStdioTerminal else newNullTerminal
      rnd <- case replay args of
               Nothing      -> newStdGen
               Just (rnd,_) -> return rnd
@@ -176,7 +176,6 @@ localquickCheckWithResult args p =
                  , collected         = []
                  , expectedFailure   = False
                  , randomSeed        = rnd
-                 , isShrinking       = False
                  , numSuccessShrinks = 0
                  , numTryShrinks     = 0
                  } (unGen (property p))
@@ -190,25 +189,32 @@ localquickCheckWithResult args p =
       | otherwise                                    = runATest st f
 
     doneTesting :: State -> (StdGen -> Int -> Prop) -> IO Result
-    doneTesting st f =
-      do if expectedFailure st then
-           return Success{ labels = summary st }
+    doneTesting st f = 
+      do
+        theOutput <- terminalOutput (terminal st)
+        if expectedFailure st then
+           return Success{ labels = summary st
+                         , numTests = numSuccessTests st
+                         , output = theOutput }
            else
-           return NoExpectedFailure{ labels = summary st }
+           return NoExpectedFailure{ labels = summary st
+                                   , numTests = numSuccessTests st
+                                   , output = theOutput }
   
     giveUp :: State -> (StdGen -> Int -> Prop) -> IO Result
     giveUp st f =
       do
+        theOutput <- terminalOutput (terminal st)
         return GaveUp{ numTests = numSuccessTests st
                      , labels   = summary st
+                     , output   = theOutput
                      }
 
     runATest :: State -> (StdGen -> Int -> Prop) -> IO Result
     runATest st f =
       do
         let size = computeSize st (numSuccessTests st) (numDiscardedTests st)
-        MkRose mres ts <- protectRose (unProp (f rnd1 size))
-        res <- mres
+        MkRose res ts <- protectRose (reduceRose (unProp (f rnd1 size)))
         callbackPostTest st res
      
         case ok res of
@@ -226,13 +232,19 @@ localquickCheckWithResult args p =
                       } f
          
           Just False -> -- failed test
-            do foundFailure st res ts
+            do numShrinks <- foundFailure st res ts
+               theOutput <- terminalOutput (terminal st)
                if not (expect res) then
-                 return Success{ labels = summary st }
+                 return Success{ labels = summary st
+                               , numTests = numSuccessTests st+1
+                               , output = theOutput }
                  else
-                 return Failure{ usedSeed = randomSeed st -- correct! (this will be split first)
-                               , usedSize = size
-                               , reason   = P.reason res
-                               , labels   = summary st
+                 return Failure{ usedSeed   = randomSeed st -- correct! (this will be split first)
+                               , usedSize   = size
+                               , reason     = P.reason res
+                               , labels     = summary st
+                               , numTests   = numSuccessTests st + 1
+                               , numShrinks = numShrinks
+                               , output     = theOutput
                                }
       where (rnd1,rnd2) = split (randomSeed st)

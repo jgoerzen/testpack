@@ -31,7 +31,7 @@ what was expected and what was received as part of the error. -}
 (@=?) :: (Eq a, Show a) => a -> a -> Result
 expected @=? actual = 
         MkResult {ok = Just (expected == actual), 
-                  expect = True,
+                  expect = True, interrupted = False,
                   reason = "Result: expected " ++ show expected ++ ", got " ++ show actual,
                   stamp = [], callbacks = []}
     
