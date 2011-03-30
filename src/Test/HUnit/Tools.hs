@@ -61,7 +61,11 @@ qccheck config lbl property =
     HU.TestLabel lbl $ HU.TestCase $
       do result <- localquickCheckWithResult config property
          case result of
+#if MIN_VERSION_QuickCheck(2,3,0)
+           Success _ _ _ -> return ()
+#else
            Success _ -> return ()
+#endif
            _ -> HU.assertFailure (show result)
 
 -- Modified from HUnit
@@ -159,7 +163,12 @@ tl msg t = HU.TestLabel msg $ HU.TestList t
 -- | Tests a property, using test arguments, produces a test result, and prints the results to 'stdout'.
 localquickCheckWithResult :: Testable prop => Args -> prop -> IO Result
 localquickCheckWithResult args p =
-  do tm  <- newTerminal
+  do 
+#if MIN_VERSION_QuickCheck(2,3,0)
+     tm  <- if chatty args then newStdioTerminal else newNullTerminal
+#else
+     tm  <- newTerminal
+#endif
      rnd <- case replay args of
               Nothing      -> newStdGen
               Just (rnd,_) -> return rnd
@@ -176,7 +185,6 @@ localquickCheckWithResult args p =
                  , collected         = []
                  , expectedFailure   = False
                  , randomSeed        = rnd
-                 , isShrinking       = False
                  , numSuccessShrinks = 0
                  , numTryShrinks     = 0
                  } (unGen (property p))
@@ -190,25 +198,50 @@ localquickCheckWithResult args p =
       | otherwise                                    = runATest st f
 
     doneTesting :: State -> (StdGen -> Int -> Prop) -> IO Result
-    doneTesting st f =
-      do if expectedFailure st then
-           return Success{ labels = summary st }
+    doneTesting st f = 
+      do
+#if MIN_VERSION_QuickCheck(2,3,0)
+        theOutput <- terminalOutput (terminal st)
+#endif
+        if expectedFailure st then
+           return Success{ labels = summary st
+#if MIN_VERSION_QuickCheck(2,3,0)
+                         , numTests = numSuccessTests st
+                         , output = theOutput 
+#endif
+                         }
            else
-           return NoExpectedFailure{ labels = summary st }
+           return NoExpectedFailure{ labels = summary st
+#if MIN_VERSION_QuickCheck(2,3,0)
+                                   , numTests = numSuccessTests st
+                                   , output = theOutput 
+#endif
+                                   }
   
     giveUp :: State -> (StdGen -> Int -> Prop) -> IO Result
     giveUp st f =
       do
+        theOutput <- terminalOutput (terminal st)
         return GaveUp{ numTests = numSuccessTests st
                      , labels   = summary st
+#if MIN_VERSION_QuickCheck(2,3,0)
+                     , output   = theOutput
+#endif
                      }
 
     runATest :: State -> (StdGen -> Int -> Prop) -> IO Result
     runATest st f =
       do
         let size = computeSize st (numSuccessTests st) (numDiscardedTests st)
+#if MIN_VERSION_QuickCheck(2,4,0)
+        MkRose res ts <- protectRose (reduceRose (unProp (f rnd1 size)))
+#elif MIN_VERSION_QuickCheck(2,3,0)
+        (mres, ts) <- unpackRose (unProp (f rnd1 size))
+        res <- mres
+#elif MIN_VERSION_QuickCheck(2,1,0)
         MkRose mres ts <- protectRose (unProp (f rnd1 size))
         res <- mres
+#endif
         callbackPostTest st res
      
         case ok res of
@@ -226,13 +259,29 @@ localquickCheckWithResult args p =
                       } f
          
           Just False -> -- failed test
-            do foundFailure st res ts
+            do 
+#if MIN_VERSION_QuickCheck(2,3,0)
+               numShrinks <- foundFailure st res ts
+               theOutput <- terminalOutput (terminal st)
+#else
+               foundFailure st res ts
+#endif
                if not (expect res) then
-                 return Success{ labels = summary st }
+                 return Success{ labels = summary st
+                               , numTests = numSuccessTests st+1
+#if MIN_VERSION_QuickCheck(2,3,0)
+                               , output = theOutput
+#endif 
+                               }
                  else
-                 return Failure{ usedSeed = randomSeed st -- correct! (this will be split first)
-                               , usedSize = size
-                               , reason   = P.reason res
-                               , labels   = summary st
+                 return Failure{ usedSeed   = randomSeed st -- correct! (this will be split first)
+                               , usedSize   = size
+                               , reason     = P.reason res
+                               , labels     = summary st
+#if MIN_VERSION_QuickCheck(2,3,0)
+                               , numTests   = numSuccessTests st + 1
+                               , numShrinks = numShrinks
+                               , output     = theOutput
+#endif
                                }
       where (rnd1,rnd2) = split (randomSeed st)
