@@ -185,6 +185,9 @@ localquickCheckWithResult args p =
                  , collected         = []
                  , expectedFailure   = False
                  , randomSeed        = rnd
+#if !(MIN_VERSION_QuickCheck(2,3,0))
+                 , isShrinking       = False
+#endif
                  , numSuccessShrinks = 0
                  , numTryShrinks     = 0
                  } (unGen (property p))
@@ -270,8 +273,8 @@ localquickCheckWithResult args p =
 #endif
                if not (expect res) then
                  return Success{ labels = summary st
-                               , numTests = numSuccessTests st+1
 #if MIN_VERSION_QuickCheck(2,3,0)
+                               , numTests = numSuccessTests st+1
                                , output = theOutput
 #endif 
                                }
