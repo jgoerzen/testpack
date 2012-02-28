@@ -47,8 +47,9 @@ instance CoArbitrary Word8 where
                 where x = abs . fromIntegral $ n
 #endif
 
+#if !MIN_VERSION_random(1,0,1)
 instance Random Word8 where
     randomR (a, b) g = (\(x, y) -> (fromInteger x, y)) $
                        randomR (toInteger a, toInteger b) g
     random g = randomR (minBound, maxBound) g
-
+#endif
