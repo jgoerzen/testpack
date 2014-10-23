@@ -18,7 +18,11 @@ Description: Haskell Test Utility Pack for HUnit and QuickCheck
  test cases.
 Stability: Beta
 Build-Type: Simple
-Cabal-Version: >=1.2
+Cabal-Version: >=1.6
+
+Source-Repository head
+  Type:                 git
+  Location:             https://github.com/jgoerzen/testpack.git
 
 Flag splitBase
   description: Choose the new smaller, split-up base package.
