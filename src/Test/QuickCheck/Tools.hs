@@ -23,15 +23,27 @@ module Test.QuickCheck.Tools (-- * Comparisons
                               
                              )
 where
+#if MIN_VERSION_QuickCheck(2,6,0)
+import Test.QuickCheck.Property (Result(..), callbacks, expect, theException, ok, reason, stamp)
+#if MIN_VERSION_QuickCheck(2,7,0)
+#else
+import Test.QuickCheck.Property (Result(..), callbacks, expect, interrupted, ok, reason, stamp)
+#endif
+#else
 import Test.QuickCheck hiding (Result, reason)
 import Test.QuickCheck.Property
+#endif
 
 {- | Compare two values.  If same, the test passes.  If different, the result indicates
 what was expected and what was received as part of the error. -}
 (@=?) :: (Eq a, Show a) => a -> a -> Result
 expected @=? actual = 
         MkResult {ok = Just (expected == actual), 
+#if MIN_VERSION_QuickCheck(2,7,0)
+                  expect = True, theException = Nothing,
+#else
                   expect = True, interrupted = False,
+#endif
                   reason = "Result: expected " ++ show expected ++ ", got " ++ show actual,
                   stamp = [], callbacks = []}
     

@@ -25,7 +25,14 @@ import qualified Test.QuickCheck.Property as P
 import Test.QuickCheck.Property hiding (Result(reason))
 import qualified Control.Exception
 import qualified Test.HUnit as HU
-import System.Random
+#if MIN_VERSION_QuickCheck(2,7,0)
+import Test.QuickCheck.Random (newQCGen, QCGen(..))
+import System.Random (split)
+#else
+import System.Random (newStdGen, StdGen(..), split)
+#define newStdGen newQCGen
+#define StdGen QCGen
+#endif
 import System.IO
 import Text.Printf
 
@@ -96,7 +103,7 @@ qctest lbl = qccheck stdArgs lbl
 
 {-
 -- | modified version of the tests function from Test.QuickCheck
-tests :: Args -> Gen Result -> StdGen -> Int -> Int -> [[String]] -> IO ()
+tests :: Args -> Gen Result -> QCGen -> Int -> Int -> [[String]] -> IO ()
 tests config gen rnd0 ntest nfail stamps
   | ntest == maxSuccess config = return ()
   | nfail == maxDiscard config = assertFailure $ "Arguments exhausted after " ++ show ntest ++ " tests."
@@ -128,7 +135,13 @@ Often used like this:
 >        q "Integer -> Int (safe bounds)" prop_integer_to_int_pass]
 -}
 qc2hu :: QC.Testable a => Int -> String -> a -> HU.Test
-qc2hu maxTest = qccheck (stdArgs {maxSuccess = maxTest, maxDiscard = 20000})
+qc2hu maxTest = qccheck (stdArgs {maxSuccess = maxTest,
+#if MIN_VERSION_QuickCheck(2,5,0)
+                                  maxDiscardRatio = if maxTest /= 0 then 20000 `div` maxTest else 10
+#else
+                                  maxDiscard = 20000
+#endif
+                                 })
 
 {- | Run verbose tests.  Example:
 
@@ -163,18 +176,28 @@ tl msg t = HU.TestLabel msg $ HU.TestList t
 -- | Tests a property, using test arguments, produces a test result, and prints the results to 'stdout'.
 localquickCheckWithResult :: Testable prop => Args -> prop -> IO Result
 localquickCheckWithResult args p =
-  do 
 #if MIN_VERSION_QuickCheck(2,3,0)
-     tm  <- if chatty args then newStdioTerminal else newNullTerminal
+#if MIN_VERSION_QuickCheck(2,6,0)
+  (if chatty args then withStdioTerminal else withNullTerminal) $ \tm -> do
 #else
+  do
+     tm  <- if chatty args then newStdioTerminal else newNullTerminal
+#endif
+#else
+  do
      tm  <- newTerminal
 #endif
      rnd <- case replay args of
-              Nothing      -> newStdGen
+              Nothing      -> newQCGen
               Just (rnd,_) -> return rnd
      test MkState{ terminal          = tm
                  , maxSuccessTests   = maxSuccess args
-                 , maxDiscardedTests = maxDiscard args
+                 , maxDiscardedTests =
+#if MIN_VERSION_QuickCheck(2,5,0)
+                                       maxDiscardRatio args * maxSuccess args
+#else
+                                       maxDiscard args
+#endif
                  , computeSize       = case replay args of
                                          Nothing    -> \n d -> (n * maxSize args)
                                                          `div` maxSuccess args
@@ -190,17 +213,23 @@ localquickCheckWithResult args p =
 #endif
                  , numSuccessShrinks = 0
                  , numTryShrinks     = 0
+#if MIN_VERSION_QuickCheck(2,7,0)
+                 , numRecentlyDiscardedTests = 0
+                 , numTotTryShrinks = 0
+                 } (unGen (unProperty (property p)))
+#else
                  } (unGen (property p))
+#endif
   where 
 --------------------------------------------------------------------------
 -- main test loop
-    test :: State -> (StdGen -> Int -> Prop) -> IO Result
+    test :: State -> (QCGen -> Int -> Prop) -> IO Result
     test st f
       | numSuccessTests st   >= maxSuccessTests st   = doneTesting st f
       | numDiscardedTests st >= maxDiscardedTests st = giveUp st f
       | otherwise                                    = runATest st f
 
-    doneTesting :: State -> (StdGen -> Int -> Prop) -> IO Result
+    doneTesting :: State -> (QCGen -> Int -> Prop) -> IO Result
     doneTesting st f = 
       do
 #if MIN_VERSION_QuickCheck(2,3,0)
@@ -221,7 +250,7 @@ localquickCheckWithResult args p =
 #endif
                                    }
   
-    giveUp :: State -> (StdGen -> Int -> Prop) -> IO Result
+    giveUp :: State -> (QCGen -> Int -> Prop) -> IO Result
     giveUp st f =
       do
 #if MIN_VERSION_QuickCheck(2,3,0)
@@ -234,7 +263,7 @@ localquickCheckWithResult args p =
 #endif
                      }
 
-    runATest :: State -> (StdGen -> Int -> Prop) -> IO Result
+    runATest :: State -> (QCGen -> Int -> Prop) -> IO Result
     runATest st f =
       do
         let size = computeSize st (numSuccessTests st) (numDiscardedTests st)
@@ -266,7 +295,12 @@ localquickCheckWithResult args p =
           Just False -> -- failed test
             do 
 #if MIN_VERSION_QuickCheck(2,3,0)
+#if MIN_VERSION_QuickCheck(2,3,0)
+               (numShrinks, totFailed, lastFailed) <- foundFailure st res ts
+#else
                numShrinks <- foundFailure st res ts
+#endif
+
                theOutput <- terminalOutput (terminal st)
 #else
                foundFailure st res ts
@@ -287,6 +321,10 @@ localquickCheckWithResult args p =
                                , numTests   = numSuccessTests st + 1
                                , numShrinks = numShrinks
                                , output     = theOutput
+#endif
+#if MIN_VERSION_QuickCheck(2,7,0)
+                               , numShrinkTries = totFailed
+                               , numShrinkFinal = lastFailed
 #endif
                                }
       where (rnd1,rnd2) = split (randomSeed st)
