@@ -6,7 +6,7 @@ Author: John Goerzen
 Copyright: Copyright (c) 2004-2010 John Goerzen
 license-file: COPYRIGHT
 extra-source-files: COPYING, Makefile
-homepage: http://hackage.haskell.org/cgi-bin/hackage-scripts/package/testpack
+homepage: https://github.com/jgoerzen/testpack
 Category: Testing
 synopsis: Test Utililty Pack for HUnit and QuickCheck
 Description: Haskell Test Utility Pack for HUnit and QuickCheck
