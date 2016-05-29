@@ -1,3 +1,18 @@
+haskell-testpack (2.1.1-1) unstable; urgency=low
+
+  * [27449fc] Imported Upstream version 2.1.1
+  * [ef9f6c1] Comment out Random Word8 instance. Provided by Random now.
+  * [e405ea5] Depend on Random
+
+ -- Iain Lane <laney@debian.org>  Sat, 25 Feb 2012 23:31:53 +0000
+
+haskell-testpack (2.1.0-1) unstable; urgency=low
+
+  * s/ghc6/ghc/
+  * New upstream release
+
+ -- Joachim Breitner <nomeata@debian.org>  Thu, 21 Apr 2011 14:34:19 +0530
+
 haskell-testpack (2.0.0-3) unstable; urgency=low
 
   * Quick FTBFS fix due to minor QuickCheck API change
