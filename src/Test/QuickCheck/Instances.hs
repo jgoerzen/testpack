@@ -36,15 +36,3 @@ instance (Arbitrary k, Arbitrary v, Eq k, Ord k) => Arbitrary (Map.Map k v) wher
 instance (CoArbitrary k, CoArbitrary v, Eq k, Ord k) => CoArbitrary (Map.Map k v) where
     coarbitrary = coarbitrary . Map.keys
 
-instance Arbitrary Word8 where
-    arbitrary = sized $ \n -> choose (0, min (fromIntegral n) maxBound)
-
-instance CoArbitrary Word8 where
-    coarbitrary n = variant (if n >= 0 then 2 * x else 2 * x + 1)
-                where x = abs . fromIntegral $ n
-
-instance Random Word8 where
-    randomR (a, b) g = (\(x, y) -> (fromInteger x, y)) $
-                       randomR (toInteger a, toInteger b) g
-    random g = randomR (minBound, maxBound) g
-
